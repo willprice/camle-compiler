@@ -16,11 +16,30 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
-executable camle-parser
+Executable camle-token-parser
   main-is:             Main.hs
-  -- other-modules:
-  -- other-extensions:
   build-depends:       base >=4.7 && <4.8,
+                       camle-parser,
                        parsec
   hs-source-dirs:      src
+  default-language:    Haskell2010
+
+Library
+  ghc-options:         -Wall
+  exposed-modules:     CamleTokenParser
+  build-depends:       base,
+                       parsec
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+Test-Suite test-camle-parser
+  type:                exitcode-stdio-1.0
+  main-is:             Parser.hs
+  build-depends:       base,
+                       camle-parser,
+                       parsec,
+                       tasty,
+                       tasty-hunit,
+                       HUnit
+  hs-source-dirs:      tests
   default-language:    Haskell2010
