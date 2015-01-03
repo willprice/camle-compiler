@@ -30,7 +30,7 @@ then followed by *0 to 7 alphanumeric characters*.
     <program> ::= <statements>
 
     <statements> ::= <statement> ( ';' <statement> )*
-    <statement> ::= <variable> ':=' <statement
+    <statement> ::= <variable> ':=' <expression>
                 |   'skip'
                 |   'if' <booleanExpression>
                     'then' <statement>

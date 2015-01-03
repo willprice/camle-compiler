@@ -1,0 +1,23 @@
+#+TITLE: Design of CAMLE compiler
+
+* Lexer
+There is no single lexer in the CAMLE compiler due to the use of
+the parser combinator library parsec. We produce a variety of lexers
+that will lex different things like identifiers, numbers, reserved
+words and operations. The lexers return the parsed token contained
+inside of the ~Parser~ monad.
+* Parser
+The parser is a collection of functions that utilise the lexers,
+paired with the AST datatype constructors to take a string of source
+code and produce an AST.
+
+Of particular note is parsing variable assignment and ~read~
+calls. There are only two types of variables in the CAMLE language;
+strings and integers. They are defined in two different ways:
+
+- ~a := <exp>~ defines ~a~ as an integer variable, since ~<exp>~
+  evaluates to an integer constant by the definition of the language.
+- ~read(b)~ defines ~b~ as a string variable, or if it exists,
+  replaces the value inside of 
+* Intermediate representation
+* Code generation
