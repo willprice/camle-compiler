@@ -20,8 +20,14 @@ Library
   ghc-options:         -W
   exposed-modules:     CamleCompiler.AST,
                        CamleCompiler.Lexer,
-                       CamleCompiler.Parser
+                       CamleCompiler.Parser,
+                       CamleCompiler.IR,
+                       CamleCompiler.Assembly
   build-depends:       base,
+                       containers,
+                       text-format-simple,
+                       mtl,
+                       uniplate,
                        parsec
   hs-source-dirs:      src
   default-language:    Haskell2010
@@ -30,16 +36,30 @@ Executable parser
   ghc-options:         -W -Werror
   build-depends:       base,
                        camle-compiler,
+                       uniplate,
                        parsec
   hs-source-dirs:      src
   main-is:             ParserMain.hs
   default-language:    Haskell2010
 
+Executable ir
+  ghc-options:         -W
+  build-depends:       base,
+                       containers,
+                       text-format-simple,
+                       mtl,
+                       uniplate,
+                       parsec
+  hs-source-dirs:      src
+  main-is:             IRMain.hs
+  default-language:    Haskell2010
+
+
 Test-Suite test
   default-language:    Haskell2010
   type:                exitcode-stdio-1.0
   hs-source-dirs:      tests
-  main-is:             ParserTest.hs
+  main-is:             Tests.hs
   build-depends:       base,
                        camle-compiler,
                        tasty >= 0.7,

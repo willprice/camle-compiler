@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+module ParserTests where
+
 import CamleCompiler.Parser
 import CamleCompiler.AST
 import Test.Tasty
@@ -13,12 +15,7 @@ instance Eq ParseError where
    a == b = errorMessages a == errorMessages b
 
 
-main = tests >>= defaultMain 
-
-tests :: IO TestTree
-tests = testSpec "Tests" spec
-
-spec = describe "CamleCompiler.Parser parsing" $ do
+parserSpec = describe "CamleCompiler.Parser parsing" $ do
   it "variable assignment" $ 
      shouldBe (parse "a := 123") $ wrapInProgramBoilerplate (Assign (VarName "a") (Constant 123))
   it "skip" $ 

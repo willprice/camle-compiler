@@ -1,53 +1,53 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module CamleCompiler.AST where
+import Data.Data
+import Data.Generics.Uniplate.Data()
 
 data Program = Program [Statement]
-             deriving (Show, Eq)
+             deriving (Show, Eq, Data, Typeable)
 
 data Statement = Skip
                | Assign VarName Expression
                | If BooleanExpression Statement Statement
                | While BooleanExpression Statement
                | Read VarName
-               | Write WriteStatement
+               | WriteString String
+               | WriteBoolean BooleanExpression
+               | WriteExpression Expression
                | Statements [Statement]
-               deriving (Show, Eq)
-
-data WriteStatement = WriteString String
-                    | WriteBoolean BooleanExpression
-                    | WriteExpression Expression
-                    | Writeln
-                    deriving (Show, Eq)
+               deriving (Show, Eq, Data, Typeable)
 
 data Expression = BinOp BinaryArithmeticOperation Expression Expression
                 | Negate Expression
-                | Constant Integer
-                | Var VarName
-                deriving (Show, Eq)
+                | ETerm Term
+                deriving (Show, Eq, Data, Typeable)
 
-newtype VarName = VarName String
-                deriving (Show, Eq)
+data Term = Constant Integer
+          | Var String
+          deriving (Show, Eq, Data, Typeable)
+
+data VarName = VarName String deriving (Show, Eq, Ord, Data, Typeable)
 
 
 data BinaryArithmeticOperation = Times
                          | Minus
                          | Plus
-                         deriving (Eq, Ord, Show) 
+                         deriving (Eq, Ord, Show, Data, Typeable) 
 
 data BooleanExpression = BooleanExpression BooleanTerm
                        | BAnd [BooleanTerm]
-                       deriving (Show, Eq)
+                       deriving (Show, Eq, Data, Typeable)
 
 data BooleanTerm = BNegate Boolean
                  | BTerm Boolean
-                 deriving (Show, Eq)
+                 deriving (Show, Eq, Data, Typeable)
 
 data Boolean = BTrue
              | BFalse
              | BBinOp RelationalBinaryOp Expression Expression
              | BExp BooleanExpression
-             deriving (Show, Eq)
+             deriving (Show, Eq, Data, Typeable)
 
 data RelationalBinaryOp = Equal
                         | LessThanEqual
-                        deriving (Show, Eq)
-
+                        deriving (Show, Eq, Data, Typeable)

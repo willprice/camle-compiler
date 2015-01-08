@@ -1,0 +1,70 @@
+#+TITLE: A Compiler for the CAMLE language
+* Introduction
+** Language choice
+I had initially started the coursework using ~Java~ and
+~ANTLRv4~. Unfortunately ~ANTLRv4~ deprecated the use of abstract
+syntax trees in favour of node listeners that run a procedure when a
+certain node is created[fn:parr-ast-deprecation], this was a choice by
+the author /Terence Parr/ to make the use of ~ANTLR~ easier for most
+users (who aren't building compilers). I then decided I'd switch back
+to ~ANTLRv3~ as was suggested. I implemented the lexer and parser, and
+spent a while trying to create an IR tree from the AST in ~Java~, this
+was a deeply unpleasant experience. After around 10 hours of battling
+with the ~Java~ code I decided I would instead switch to a language
+with pattern matching. I had read good things about ~Haskell~ for
+compiler writing, and I was keen to get more experience with some of
+the more advanced concepts in the language such as ~applicative
+functors~ and ~monads~.
+
+* Parser Design
+There are a variety of libraries for parser construction in ~Haskell~,
+[[https://www.haskell.org/alex/doc/html/][~alex~]] and [[https://www.haskell.org/happy/][~happy~]] are a pair of libraries often used in conjunction
+for lexical analysis and parser generatation, however since I had
+already gone down the route of parser generation in ~Java~ I decided
+that instead I would try a different style of parsing utilising
+/parser combinators/, ~parsec~ is one of the more well known libraries
+to implement this idiom, and seemed to have reasonable documentation
+so I chose this.
+
+``In functional programming, a parser combinator is a higher-order
+function that accepts several parsers as input and returns a new
+parser as its output''[fn:wiki-parser-combinator].
+
+The ~parsec~ library is so well written, the source code acts as a
+beautiful example reference. 
+* Intermediate Representation Design
+** Intermediate representation tree (from lectures)
+The IR tree given in lecture slides seemed very similar to the AST
+with the exception of allocating temporary variables for intermediate
+expressions and assigning variables memory locations. I couldn't think
+of a particularly good way of implementing this in ~Haskell~, so I
+started looking for alternatives.
+
+** Stack machine based design
+At one stage I had considered generating instructions for a stack
+machine from the AST, however I couldn't figure out how to allocate
+registers for the variables that were stored via pushing to the
+stack.
+
+** Three address code
+I could generate something quite similar to assembly code, but
+abstracted from the machine itself. This was a nice step from AST to
+assembly code by serialising the tree and allocating memory locations.
+/Three address code/ seemed like an appropriate choice of
+intermediate representation as a lot of optimisations are defined on
+it.
+* Backend Design
+* Interesting Diversions
+During the course of this coursework I made quite a few interesting
+diversions that I think I worthy of note, I ...
+- Wrote a simple embedded domain specific language for parsing
+  arithmetic expression in Haskell to learn about generalized
+  algebraic datatypes
+- Learnt about monads, an abstraction for sequencing computation. The
+  parser I built is based on monads
+- Learnt how monads can be used to maintain state in a purely
+  functional language
+* Conclusion
+
+[fn:wiki-parser-combinator] Parser Combinators - http://en.wikipedia.org/wiki/Parser_combinators
+[fn:parr-ast-deprecation] https://theantlrguy.atlassian.net/wiki/display/~admin/2012/12/08/Tree+rewriting+in+ANTLR+v4

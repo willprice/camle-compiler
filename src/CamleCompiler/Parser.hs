@@ -9,6 +9,7 @@ import qualified Text.Parsec.Expr as Expr
 import CamleCompiler.Lexer
 import CamleCompiler.AST
 
+parse :: String -> Either ParseError Program
 parse = Parsec.parse program "CamleParser"
 parseExpression = Parsec.parse expression "CamleParser expression"
 parseBooleanExpression = Parsec.parse booleanExpression "CamleParser boolean expression"
@@ -58,20 +59,20 @@ readvar = reserved "read" >>  parens identifier >>= return . Read . VarName
 
 skip = reserved "skip" >> return Skip
 
-writeln = reserved "writeln" >> (return . Write $ Writeln)
+writeln = reserved "writeln" >> (return $ WriteString "\n")
 
 write :: Parser Statement
 write = do 
            reserved "write"
            try writeString <|> try writeExpression <|> writeBoolean
 
-writeBoolean = parens booleanExpression >>= return . Write . WriteBoolean
+writeBoolean = parens booleanExpression >>= return . WriteBoolean
 
 writeString = do
            val <- parens string 
-           return $ Write $ WriteString val
+           return $ WriteString val
 
-writeExpression = parens expression >>= \exp -> return $ Write $ WriteExpression exp
+writeExpression = parens expression >>= \exp -> return $ WriteExpression exp
 
 booleanExpression = do 
                        terms <- sepBy1 booleanTerm (reservedOp "&") 
@@ -134,11 +135,13 @@ prescedenceTable = [ [prefix "-" Negate]
                    ]
 
 expression :: Parser Expression
-expression = Expr.buildExpressionParser prescedenceTable term
+expression = Expr.buildExpressionParser prescedenceTable eterm
+
+eterm = try (term >>= return . ETerm)
+      <|> parens expression
 
 term = try (integer >>= \val -> return $ Constant val)
-     <|> (identifier >>= \ident -> return $ Var (VarName ident))
-     <|> parens expression
+     <|> (identifier >>= \ident -> return $ Var ident)
 
 factor = try constant
 
@@ -150,3 +153,5 @@ binary  name fun assoc = Expr.Infix (do{ reservedOp name; return fun }) assoc
 prefix  name fun       = Expr.Prefix (do{ reservedOp name; return fun })
 postfix name fun       = Expr.Postfix (do{ reservedOp name; return fun })
 
+parseWhile :: String -> IO (Either ParseError Program)
+parseWhile file = readFile file >>= return . parse

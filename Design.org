@@ -20,4 +20,19 @@ strings and integers. They are defined in two different ways:
 - ~read(b)~ defines ~b~ as a string variable, or if it exists,
   replaces the value inside of 
 * Intermediate representation
+The intermediate representation differs from the abstract syntax tree
+in the following ways:
+- Variable names become memory locations
+- Assignment becomes move
+- Temporary variables are inserted to hold intermediate computations
+- Order of evaluation should become insignificant (?)
+
+To implement assignment functionality we need to
+- Assign variable definitions memory locations (if it's the first time
+  we've seen it)
+- Resolve variable names to memory locations
+
+A hashmap for the symbol table doesn't really work because you don't
+know what has been put into memory yet, i.e. you'd need to pass around
+an offset as well which would tell you where to put your new variable.
 * Code generation
