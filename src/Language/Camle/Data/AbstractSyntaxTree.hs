@@ -14,6 +14,9 @@ data Statement = Skip
                | WriteString String
                | WriteBoolean BooleanExpression
                | WriteExpression Expression
+               -- The list of statement are in right to left order, i.e.
+               -- the first element should be executed before the second
+               -- and so on
                | Statements [Statement]
                deriving (Show, Eq, Data, Typeable)
 

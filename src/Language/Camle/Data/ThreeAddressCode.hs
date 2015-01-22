@@ -7,25 +7,27 @@ data TAC = TAC { instruction :: Instruction
                , result :: Maybe Argument
                , arg1 :: Maybe Argument
                , arg2 :: Maybe Argument
-               } deriving (Show, Eq)
+               } deriving (Eq)
 
 data Instruction = InstrBinary BinaryOp
                  | InstrUnary UnaryOp
-                 | InstrNoop
                  | InstrIf
                  | InstrIfNot
                  | InstrAssign
                  | InstrRead
                  | InstrWriteString
                  | InstrWriteInt
-                 deriving (Show, Eq)
+                 | InstrNoop
+                 | InstrLabel
+                 deriving (Eq)
 
 data Argument = ArgLabel Label 
               | ArgConstant Integer
+              | ArgString String
               | ArgBool Bool
               | ArgVar VarName
               | ArgTempVar Integer
-              deriving (Show, Eq)
+              deriving (Eq)
 
 type VarName = String
 
@@ -38,7 +40,46 @@ data BinaryOp =
               | BOpLTE | BOpEq 
               -- Logical
               | BOpAnd
-              deriving (Show, Eq)
+              deriving (Eq)
 
 data UnaryOp = UOpMinus | UOpNegate
-             deriving (Show, Eq)
+             deriving (Eq)
+
+
+instance Show Argument where
+        show (ArgLabel lbl) = "L" ++ show lbl
+        show (ArgConstant n) = show n
+        show (ArgString s) = "\"" ++ show s ++ "\""
+        show (ArgBool bool) = show bool
+        show (ArgVar name) = show name
+        show (ArgTempVar n) = "T" ++ show n
+
+instance Show BinaryOp where
+        show op = case op of
+                      BOpSub -> "-"
+                      BOpAdd -> "+"
+                      BOpMul -> "*"
+                      BOpLTE -> "<="
+                      BOpEq -> "="
+                      BOpAnd -> "&"
+
+instance Show UnaryOp where
+        show op = case op of
+                      UOpMinus -> "-"
+                      UOpNegate -> "!"
+
+instance Show TAC where
+        show tac = case instruction tac of 
+                                    InstrAssign -> show res ++ " := " ++ show a1
+                                    (InstrBinary op) -> show res ++ " := " ++ show a1 ++ show op ++ show a2
+                                    (InstrUnary op) -> show res ++ " := " ++ show op ++ show a1
+                                    InstrIf -> "if " ++ show a1 ++ " goto " ++ show a2
+                                    InstrIfNot -> "if not " ++ show a1 ++ " goto " ++ show a2
+                                    InstrRead -> show res ++ " := " ++ "read"
+                                    InstrWriteString -> "write " ++ show a1
+                                    InstrWriteInt -> "write " ++ show a1
+                                    InstrNoop -> "noop"
+                                    InstrLabel -> "L" ++ show a1
+                                    where a1 = arg1 tac
+                                          a2 = arg2 tac
+                                          res = result tac
