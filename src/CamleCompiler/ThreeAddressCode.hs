@@ -3,8 +3,6 @@ module CamleCompiler.ThreeAddressCode where
 import Data.Data
 import Data.Generics.Uniplate.Data()
 
-data Variable = Variable { name :: String } deriving (Eq, Ord, Show, Data, Typeable)
-
 type InstructionSeq = [Instruction]
 
 newtype Label = Label String
@@ -19,11 +17,6 @@ data Instruction = Assign Term Exp
                  | ILabel Label
                  deriving (Eq, Show, Data, Typeable)
 
-
-data RelOp = Equal
-           | LessThanEqual
-           deriving (Eq, Show, Data, Typeable)
-
 data Exp = BinOp Op Term Term
          | UnaryOp Op Term
          | ETerm Term
@@ -34,13 +27,15 @@ data Op = Plus
         | Times
         | And
         | Negate
+        | Equal
+        | LessThanEqual
         deriving (Eq, Show, Data, Typeable)
 
-data ID = Var String
-        | TemporaryVar Integer
-        deriving (Eq, Show, Data, Typeable)
+data Variable = Var String
+              | TemporaryVar Integer
+              deriving (Eq, Show, Data, Typeable)
 
-data Term = TID ID
+data Term = TVar Variable
           | TValue Value
           deriving (Eq, Show, Data, Typeable)
 
@@ -48,3 +43,9 @@ data Value = Constant Integer
            | Boolean Bool
            | StringLiteral String
            deriving (Eq, Show, Data, Typeable)
+
+
+valueToExpression val = ETerm $ TValue val
+variableToExpression var = ETerm $ variableToTerm var
+variableToTerm var = TVar var
+binOpOfVariables op var1 var2 = BinOp op (TVar var1) (TVar var2)

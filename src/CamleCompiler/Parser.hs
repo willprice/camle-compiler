@@ -6,8 +6,8 @@ import Text.Parsec.String (Parser)
 import qualified Text.Parsec as Parsec
 import qualified Text.Parsec.Expr as Expr
 
+import CamleCompiler.AbstractSyntaxTree
 import CamleCompiler.Lexer
-import CamleCompiler.AST
 
 parse :: String -> Either ParseError Program
 parse = Parsec.parse program "CamleParser"
@@ -75,10 +75,10 @@ writeString = do
 writeExpression = parens expression >>= \exp -> return $ WriteExpression exp
 
 booleanExpression = do 
-                       terms <- sepBy1 booleanTerm (reservedOp "&") 
-                       return $ case terms of
-                           [term] -> BooleanExpression term
-                           _ -> BAnd terms
+                       b1 <- booleanTerm 
+                       reservedOp "&"
+                       b2 <- booleanTerm
+                       return $ BAnd b1 b2
 
 booleanTerm = try negatedBoolean <|> (boolean >>= return . BTerm)
 

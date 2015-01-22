@@ -18,10 +18,10 @@ cabal-version:       >=1.10
 
 Library
   ghc-options:         -W
-  exposed-modules:     CamleCompiler.AST,
+  exposed-modules:     CamleCompiler.AbstractSyntaxTree,
                        CamleCompiler.Lexer,
                        CamleCompiler.Parser,
-                       CamleCompiler.IR,
+                       CamleCompiler.IntermediateRepresentation,
                        CamleCompiler.Assembly
   build-depends:       base,
                        containers,

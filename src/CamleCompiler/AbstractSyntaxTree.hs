@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-module CamleCompiler.AST where
+module CamleCompiler.AbstractSyntaxTree where
 import Data.Data
 import Data.Generics.Uniplate.Data()
 
@@ -35,7 +35,7 @@ data BinaryArithmeticOperation = Times
                          deriving (Eq, Ord, Show, Data, Typeable) 
 
 data BooleanExpression = BooleanExpression BooleanTerm
-                       | BAnd [BooleanTerm]
+                       | BAnd BooleanTerm BooleanTerm
                        deriving (Show, Eq, Data, Typeable)
 
 data BooleanTerm = BNegate Boolean
