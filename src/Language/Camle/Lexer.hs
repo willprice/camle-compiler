@@ -1,4 +1,4 @@
-module CamleCompiler.Lexer (constant, parens, reserved, reservedOp, identifier, whitespace, integer) where
+module Language.Camle.Lexer (constant, parens, reserved, reservedOp, identifier, whitespace) where
 
 import Text.Parsec.Char (letter, alphaNum)
 import Text.Parsec.Language (emptyDef)
@@ -22,15 +22,8 @@ camleStyle = emptyDef { Token.commentStart = "{"
           reservedOperations = ["+", "-", "*", ":=", "!", ";", "<=", "=", "(", ")"]
 
 constant = Token.integer lexer
-
 parens = Token.parens lexer
-
 reserved = Token.reserved lexer
-
 reservedOp = Token.reservedOp lexer
-
 identifier = Token.identifier lexer
-
 whitespace = Token.whiteSpace lexer
-
-integer = Token.integer lexer

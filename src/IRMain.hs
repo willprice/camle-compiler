@@ -1,8 +1,8 @@
 module Main where
 import System.Environment
 
-import CamleCompiler.Parser
-import CamleCompiler.IR
+import Language.Camle.Parser
+import Language.Camle.IntermediateRepresentation
 
 main = do
         [filename] <- getArgs

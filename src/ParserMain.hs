@@ -1,7 +1,7 @@
 module Main where
 import System.Environment
 
-import CamleCompiler.Parser
+import Language.Camle.Parser
 
 main = do
         [filename] <- getArgs

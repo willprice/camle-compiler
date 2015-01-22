@@ -1,18 +1,16 @@
-module CamleCompiler.Assembly where
-
-import Text.Format
+module Language.Camle.Data.Assembly where
 
 newtype Address = Address Integer
-               deriving (Show, Eq, Ord)
+                deriving (Show, Eq, Ord)
 
 newtype AddressOffset = AddressOffset Integer
-               deriving (Show, Eq, Ord)
+                      deriving (Show, Eq, Ord)
 
 newtype Byte = Byte Integer
-               deriving (Show, Eq, Ord)
+             deriving (Show, Eq, Ord)
 
 data Register = Register Integer Integer
-                 deriving (Eq, Ord)
+              deriving (Eq, Ord)
 
 
 data Instruction = ADD Register Register Register
@@ -36,4 +34,4 @@ data Instruction = ADD Register Register Register
                  deriving (Eq)
 
 instance Show Register where
-        show (Register number _) = "R" ++ show number
+        show (Register number contents) = "R" ++ show number ++ ": " ++ show contents

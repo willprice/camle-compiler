@@ -1,11 +1,11 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
-module CamleCompiler.IntermediateRepresentation where
+module Language.Camle.IntermediateRepresentation where
 
 import Control.Monad.State
 import qualified Data.Map.Strict as M
 
-import qualified CamleCompiler.AbstractSyntaxTree as AST
-import qualified CamleCompiler.ThreeAddressCode as TAC
+import qualified Language.Camle.AbstractSyntaxTree as AST
+import qualified Language.Camle.ThreeAddressCode as TAC
 
 {- Abstract Syntax Tree to Three Address Code translation
 -

@@ -1,4 +1,4 @@
-module CamleCompiler.Parser where
+module Language.Camle.Parser where
 
 import Text.Parsec hiding (parse, string)
 import Text.Parsec.String (Parser)
@@ -6,8 +6,8 @@ import Text.Parsec.String (Parser)
 import qualified Text.Parsec as Parsec
 import qualified Text.Parsec.Expr as Expr
 
-import CamleCompiler.AbstractSyntaxTree
-import CamleCompiler.Lexer
+import Language.Camle.Data.AbstractSyntaxTree
+import Language.Camle.Lexer
 
 parse :: String -> Either ParseError Program
 parse = Parsec.parse program "CamleParser"
@@ -140,7 +140,7 @@ expression = Expr.buildExpressionParser prescedenceTable eterm
 eterm = try (term >>= return . ETerm)
       <|> parens expression
 
-term = try (integer >>= \val -> return $ Constant val)
+term = try (constant >>= \val -> return $ Constant val)
      <|> (identifier >>= \ident -> return $ Var ident)
 
 factor = try constant

@@ -18,11 +18,10 @@ cabal-version:       >=1.10
 
 Library
   ghc-options:         -W
-  exposed-modules:     CamleCompiler.AbstractSyntaxTree,
-                       CamleCompiler.Lexer,
-                       CamleCompiler.Parser,
-                       CamleCompiler.IntermediateRepresentation,
-                       CamleCompiler.Assembly
+  exposed-modules:     Language.Camle.Data.AbstractSyntaxTree,
+                       Language.Camle.Lexer,
+                       Language.Camle.Parser,
+                       Language.Camle.IntermediateRepresentation
   build-depends:       base,
                        containers,
                        text-format-simple,
@@ -55,14 +54,14 @@ Executable ir
   default-language:    Haskell2010
 
 
-Test-Suite test
-  default-language:    Haskell2010
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      tests
-  main-is:             Tests.hs
-  build-depends:       base,
-                       camle-compiler,
-                       tasty >= 0.7,
-                       tasty-hspec,
-                       hspec,
-                       parsec
+-- Test-Suite test
+--   default-language:    Haskell2010
+--   type:                exitcode-stdio-1.0
+--   hs-source-dirs:      tests
+--   main-is:             Tests.hs
+--   build-depends:       base,
+--                        camle-compiler,
+--                        tasty >= 0.7,
+--                        tasty-hspec,
+--                        hspec,
+--                        parsec

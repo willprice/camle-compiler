@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-module CamleCompiler.AbstractSyntaxTree where
+module Language.Camle.Data.AbstractSyntaxTree where
 import Data.Data
 import Data.Generics.Uniplate.Data()
 
