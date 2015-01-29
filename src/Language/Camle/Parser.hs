@@ -36,7 +36,7 @@ statement = try skip
           <|> try whileloop
           <|> try readvar
           <|> try variableAssignment 
-          <|> ((parens $ sepBy1 statement (reservedOp ";")) >>= return . Statements)
+          <|> (parens $ sepBy1 statement (reservedOp ";") >>= return . Statements)
 
 whileloop = do
         reserved "while"
@@ -74,11 +74,13 @@ writeString = do
 
 writeExpression = parens expression >>= \exp -> return $ WriteExpression exp
 
-booleanExpression = do 
-                       b1 <- booleanTerm 
-                       reservedOp "&"
-                       b2 <- booleanTerm
-                       return $ BAnd b1 b2
+booleanExpression = try booleanAnd
+                  <|> (booleanTerm >>= return . BooleanExpression)
+booleanAnd = do
+        b1 <- booleanTerm 
+        reservedOp "&"
+        b2 <- booleanTerm
+        return $ BAnd b1 b2
 
 booleanTerm = try negatedBoolean <|> (boolean >>= return . BTerm)
 
@@ -96,15 +98,11 @@ booleanComparison = do
         e2 <- expression
         return $ BBinOp op e1 e2
 
-relationalOperator = try relationalEquals <|> relationalLessThanEquals
+relationalOperator = relationalEquals <|> relationalLessThanEquals
 
-relationalEquals = do
-        reservedOp "="
-        return Equal
+relationalEquals = reservedOp "=" >> return Equal
 
-relationalLessThanEquals = do
-        reservedOp "<="
-        return LessThanEqual
+relationalLessThanEquals = reservedOp "<=" >> return LessThanEqual
 
 true = do
         reserved "true" 
@@ -114,13 +112,13 @@ false = do
         reserved "false"
         return BFalse
 
-string = between (reservedOp "'") (reservedOp "'") $ many1 stringChar
+string = between (char '\'') (char '\'') $ many1 stringChar
 
 stringChar = try escapedQuote
            <|> noneOf "'"
     where escapedQuote = stringEscapeChar >> char '\''
 
-stringEscapeChar = char '\''
+stringEscapeChar = char '\\'
 
 
 variableAssignment = do

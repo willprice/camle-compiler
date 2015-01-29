@@ -16,6 +16,25 @@ compiler writing, and I was keen to get more experience with some of
 the more advanced concepts in the language such as ~applicative
 functors~ and ~monads~.
 
+** How to use the compiler
+The compiler is written in Haskell and can be built using the Haskell
+communities standard build tools ~cabal~. Run ~cabal build~ to build
+executables in the ~./dist/build~ folder, or alternatively run ~cabal
+install compiler~ to install the ~compiler~ executable to your local
+cabal repository: ~$HOME/.cabal/bin~ which should be added to your
+path.
+
+I have included binaries in case the marker does not have access to
+~cabal~. The compiler outputs ASM code, so run it with redirection if
+you wish to store the ASM code in a file.
+* Features implemented
+I have successfully implemented all aspects of the compiler including:
+- Variable assignment
+- Arithmetic expressions
+- Boolean expressions
+- Conditional statements
+- While loops
+- Read and Write statements
 * Parser Design
 There are a variety of libraries for parser construction in ~Haskell~,
 [[https://www.haskell.org/alex/doc/html/][~alex~]] and [[https://www.haskell.org/happy/][~happy~]] are a pair of libraries often used in conjunction
@@ -30,8 +49,8 @@ so I chose this.
 function that accepts several parsers as input and returns a new
 parser as its output''[fn:wiki-parser-combinator].
 
-The ~parsec~ library is so well written, the source code acts as a
-beautiful example reference. 
+The ~parsec~ library is exceptionally well written, the source code
+acts as a beautiful example reference.
 * Intermediate Representation Design
 ** Intermediate representation tree (from lectures)
 The IR tree given in lecture slides seemed very similar to the AST
@@ -44,27 +63,53 @@ started looking for alternatives.
 At one stage I had considered generating instructions for a stack
 machine from the AST, however I couldn't figure out how to allocate
 registers for the variables that were stored via pushing to the
-stack.
+stack so I abandoned this idea
 
 ** Three address code
 I could generate something quite similar to assembly code, but
 abstracted from the machine itself. This was a nice step from AST to
 assembly code by serialising the tree and allocating memory locations.
-/Three address code/ seemed like an appropriate choice of
+/Three address code/ (TAC) seemed like an appropriate choice of
 intermediate representation as a lot of optimisations are defined on
 it.
+
+After selecting TAC as my intermediate representation, I constructed a
+monad encapsulated the state of translation:
+- Next free label, temporary variable
+- Code generated so far
+
+Haskell's type classes and pattern matching came in very useful for
+defining transformations as it reduces a lot of the boilerplate code
+you would have to write in Java. My implementation is by no means
+great, but I think it demonstrates some of the features of Haskell
+that are well suited to compiler construction.
 * Backend Design
+The backend targetting the Jouette style architecture was written
+using exactly the same ideas as the AST to IR translation phase, there
+is nothing much of note.
 * Interesting Diversions
 During the course of this coursework I made quite a few interesting
-diversions that I think I worthy of note, I ...
+diversions that I think are worthy of note, I ...
 - Wrote a simple embedded domain specific language for parsing
   arithmetic expression in Haskell to learn about generalized
   algebraic datatypes
+- Learn about functors and applicative functors and their use in
+  eliminating the use of ~null~ (the ~Maybe~ functor), selecting
+  between choices, combining simple pretty printing functions to
+  produce much more ellaborate functions.
 - Learnt about monads, an abstraction for sequencing computation. The
-  parser I built is based on monads
-- Learnt how monads can be used to maintain state in a purely
-  functional language
-* Conclusion
+  lexers, parser, AST to IR translation and IR to ASM translation are
+  all built on monads. This was primarily to maintain state, I found
+  the feature of referential transparency extremely useful in
+  verifying program correctness, dropping back into stateful
+  programming where only utterly necessary.
 
+* Conclusion
+Perhaps I was naive in my choice of Haskell for implementation as I
+didn't take into account just how much work and effort I would have to
+put in, but 100 hours later, I can say I'm much more aquianted with
+Haskell, and have a pretty good idea of how to write lexers by hand, and
+how to selectively use backtracking inside of parsers to minimize
+performance loss.
 [fn:wiki-parser-combinator] Parser Combinators - http://en.wikipedia.org/wiki/Parser_combinators
 [fn:parr-ast-deprecation] https://theantlrguy.atlassian.net/wiki/display/~admin/2012/12/08/Tree+rewriting+in+ANTLR+v4
