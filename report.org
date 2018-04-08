@@ -1,0 +1,237 @@
+#+TITLE: A Compiler for the CAMLE language
+* Introduction
+** Language choice
+I had initially started the coursework using ~Java~ and
+~ANTLRv4~. Unfortunately ~ANTLRv4~ deprecated the use of abstract
+syntax trees in favour of node listeners that run a procedure when a
+certain node is created[fn:parr-ast-deprecation], this was a choice by
+the author /Terence Parr/ to make the use of ~ANTLR~ easier for most
+users (who aren't building compilers). I then decided I'd switch back
+to ~ANTLRv3~ as was suggested. I implemented the lexer and parser, and
+spent a while trying to create an IR tree from the AST in ~Java~, this
+was a deeply unpleasant experience. After around 10 hours of battling
+with the ~Java~ code I decided I would instead switch to a language
+with pattern matching. I had read good things about ~Haskell~ for
+compiler writing, and I was keen to get more experience with some of
+the more advanced concepts in the language such as ~applicative
+functors~ and ~monads~.
+
+** How to use the compiler
+The compiler is written in Haskell and can be built using the Haskell
+communities standard build tools ~cabal~. Run ~cabal build~ to build
+executables in the ~./dist/build~ folder, or alternatively run ~cabal
+install compiler~ to install the ~compiler~ executable to your local
+cabal repository: ~$HOME/.cabal/bin~ which should be added to your
+path.
+
+I have included binaries in case the marker does not have access to
+~cabal~. The compiler outputs ASM code, so run it with redirection if
+you wish to store the ASM code in a file.
+* Features implemented
+I have successfully implemented all aspects of the compiler including:
+- Variable assignment
+- Arithmetic expressions
+- Boolean expressions
+- Conditional statements
+- While loops
+- Read and Write statements
+* Parser Design
+There are a variety of libraries for parser construction in ~Haskell~,
+[[https://www.haskell.org/alex/doc/html/][~alex~]] and [[https://www.haskell.org/happy/][~happy~]] are a pair of libraries often used in conjunction
+for lexical analysis and parser generatation, however since I had
+already gone down the route of parser generation in ~Java~ I decided
+that instead I would try a different style of parsing utilising
+/parser combinators/, ~parsec~ is one of the more well known libraries
+to implement this idiom, and seemed to have reasonable documentation
+so I chose this.
+
+``In functional programming, a parser combinator is a higher-order
+function that accepts several parsers as input and returns a new
+parser as its output''[fn:wiki-parser-combinator].
+
+The ~parsec~ library is exceptionally well written, the source code
+acts as a beautiful example reference.
+* Intermediate Representation Design
+** Intermediate representation tree (from lectures)
+The IR tree given in lecture slides seemed very similar to the AST
+with the exception of allocating temporary variables for intermediate
+expressions and assigning variables memory locations. I couldn't think
+of a particularly good way of implementing this in ~Haskell~, so I
+started looking for alternatives.
+
+** Stack machine based design
+At one stage I had considered generating instructions for a stack
+machine from the AST, however I couldn't figure out how to allocate
+registers for the variables that were stored via pushing to the
+stack so I abandoned this idea
+
+** Three address code
+I could generate something quite similar to assembly code, but
+abstracted from the machine itself. This was a nice step from AST to
+assembly code by serialising the tree and allocating memory locations.
+/Three address code/ (TAC) seemed like an appropriate choice of
+intermediate representation as a lot of optimisations are defined on
+it.
+
+After selecting TAC as my intermediate representation, I constructed a
+monad encapsulated the state of translation:
+- Next free label, temporary variable
+- Code generated so far
+
+Haskell's type classes and pattern matching came in very useful for
+defining transformations as it reduces a lot of the boilerplate code
+you would have to write in Java. My implementation is by no means
+great, but I think it demonstrates some of the features of Haskell
+that are well suited to compiler construction.
+* Backend Design
+The backend targetting the Jouette style architecture was written
+using exactly the same ideas as the AST to IR translation phase, there
+is nothing much of note.
+* Interesting Diversions
+During the course of this coursework I made quite a few interesting
+diversions that I think are worthy of note, I ...
+- Wrote a simple embedded domain specific language for parsing
+  arithmetic expression in Haskell to learn about generalized
+  algebraic datatypes
+- Learn about functors and applicative functors and their use in
+  eliminating the use of ~null~ (the ~Maybe~ functor), selecting
+  between choices, combining simple pretty printing functions to
+  produce much more ellaborate functions.
+- Learnt about monads, an abstraction for sequencing computation. The
+  lexers, parser, AST to IR translation and IR to ASM translation are
+  all built on monads. This was primarily to maintain state, I found
+  the feature of referential transparency extremely useful in
+  verifying program correctness, dropping back into stateful
+  programming where only utterly necessary.
+
+* Extras
+- I wrote the lexer by hand using parser combinators.
+- All in one language
+- Both IR and ASM have their own algebraic data types, so it is much
+  easier to perform optimisations by the use of pattern matching (as
+  opposed to emitting strings)
+
+* Conclusion
+Perhaps I was naive in my choice of Haskell for implementation as I
+didn't take into account just how much work and effort I would have to
+put in, but 100 hours later, I can say I'm much more aquianted with
+Haskell, and have a pretty good idea of how to write lexers by hand, and
+how to selectively use backtracking inside of parsers to minimize
+performance loss.
+[fn:wiki-parser-combinator] Parser Combinators - http://en.wikipedia.org/wiki/Parser_combinators
+[fn:parr-ast-deprecation] https://theantlrguy.atlassian.net/wiki/display/~admin/2012/12/08/Tree+rewriting+in+ANTLR+v4
+* Assmule outputs
+** Test1
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test1.ass ASSEMBLY BEGINS
+---test1.ass ASSEMBLY ENDS
+---test1.ass EXECUTION BEGINS
+10023
+10023
+76
+76
+---test1.ass EXECUTION ENDS
+STATISTICS:
+  22 instructions generated
+  8 registers used
+  22 instructions executed
+
+** Test2
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test2.ass ASSEMBLY BEGINS
+---test2.ass ASSEMBLY ENDS
+---test2.ass EXECUTION BEGINS
+7
+-5
+28
+-91
+70
+---test2.ass EXECUTION ENDS
+STATISTICS:
+  45 instructions generated
+  34 registers used
+  45 instructions executed
+
+** Test3
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test3.ass ASSEMBLY BEGINS
+---test3.ass ASSEMBLY ENDS
+---test3.ass EXECUTION BEGINS
+Enter a number: 123
+Enter a number: 456
+First is 123; second is 456
+---test3.ass EXECUTION ENDS
+STATISTICS:
+  15 instructions generated
+  5 registers used
+  15 instructions executed
+
+** Test4
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test4.ass ASSEMBLY BEGINS
+---test4.ass ASSEMBLY ENDS
+---test4.ass EXECUTION BEGINS
+13
+5
+
+78bce
+---test4.ass EXECUTION ENDS
+STATISTICS:
+  147 instructions generated
+  58 registers used
+  104 instructions executed
+
+** Test5
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test5.ass ASSEMBLY BEGINS
+---test5.ass ASSEMBLY ENDS
+---test5.ass EXECUTION BEGINS
+1
+WARNING: Disabled backward jump in   11: JMP 1  
+3
+WARNING: Disabled backward jump in   33: JMP 23  
+7
+WARNING: Disabled backward jump in   57: JMP 47  
+b
+WARNING: Disabled backward jump in   88: JMP 79  
+c
+WARNING: Disabled backward jump in  106: JMP 97  
+d
+WARNING: Disabled backward jump in  116: JMP 107  
+WARNING: Disabled backward jump in  117: JMP 89  
+---test5.ass EXECUTION ENDS
+STATISTICS:
+  119 instructions generated
+  51 registers used
+  88 instructions executed
+
+** Test6
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test6.ass ASSEMBLY BEGINS
+---test6.ass ASSEMBLY ENDS
+---test6.ass EXECUTION BEGINS
+truefalsefalsetruetruefalsefalsefalsetruefalsefalsefalsefalse
+---test6.ass EXECUTION ENDS
+STATISTICS:
+  161 instructions generated
+  51 registers used
+  115 instructions executed
+
+** Test7
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test7.ass ASSEMBLY BEGINS
+---test7.ass ASSEMBLY ENDS
+---test7.ass EXECUTION BEGINS
+Factorial calculator
+Enter number: 10
+Factorial of 10 is 3628800
+
+Exponential calculator
+Enter base: 10  
+Enter exponent: 4
+10 raised to the power of 4 is 10000
+---test7.ass EXECUTION ENDS
+STATISTICS:
+  87 instructions generated
+  33 registers used
+  281 instructions executed

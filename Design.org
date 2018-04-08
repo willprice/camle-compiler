@@ -1,0 +1,38 @@
+#+TITLE: Design of CAMLE compiler
+
+* Lexer
+There is no single lexer in the CAMLE compiler due to the use of
+the parser combinator library parsec. We produce a variety of lexers
+that will lex different things like identifiers, numbers, reserved
+words and operations. The lexers return the parsed token contained
+inside of the ~Parser~ monad.
+* Parser
+The parser is a collection of functions that utilise the lexers,
+paired with the AST datatype constructors to take a string of source
+code and produce an AST.
+
+Of particular note is parsing variable assignment and ~read~
+calls. There are only two types of variables in the CAMLE language;
+strings and integers. They are defined in two different ways:
+
+- ~a := <exp>~ defines ~a~ as an integer variable, since ~<exp>~
+  evaluates to an integer constant by the definition of the language.
+- ~read(b)~ defines ~b~ as a string variable, or if it exists,
+  replaces the value inside of 
+* Intermediate representation
+The intermediate representation differs from the abstract syntax tree
+in the following ways:
+- Variable names become memory locations
+- Assignment becomes move
+- Temporary variables are inserted to hold intermediate computations
+- Order of evaluation should become insignificant (?)
+
+To implement assignment functionality we need to
+- Assign variable definitions memory locations (if it's the first time
+  we've seen it)
+- Resolve variable names to memory locations
+
+A hashmap for the symbol table doesn't really work because you don't
+know what has been put into memory yet, i.e. you'd need to pass around
+an offset as well which would tell you where to put your new variable.
+* Code generation
