@@ -104,6 +104,13 @@ diversions that I think are worthy of note, I ...
   verifying program correctness, dropping back into stateful
   programming where only utterly necessary.
 
+* Extras
+- I wrote the lexer by hand using parser combinators.
+- All in one language
+- Both IR and ASM have their own algebraic data types, so it is much
+  easier to perform optimisations by the use of pattern matching (as
+  opposed to emitting strings)
+
 * Conclusion
 Perhaps I was naive in my choice of Haskell for implementation as I
 didn't take into account just how much work and effort I would have to
@@ -113,3 +120,118 @@ how to selectively use backtracking inside of parsers to minimize
 performance loss.
 [fn:wiki-parser-combinator] Parser Combinators - http://en.wikipedia.org/wiki/Parser_combinators
 [fn:parr-ast-deprecation] https://theantlrguy.atlassian.net/wiki/display/~admin/2012/12/08/Tree+rewriting+in+ANTLR+v4
+* Assmule outputs
+** Test1
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test1.ass ASSEMBLY BEGINS
+---test1.ass ASSEMBLY ENDS
+---test1.ass EXECUTION BEGINS
+10023
+10023
+76
+76
+---test1.ass EXECUTION ENDS
+STATISTICS:
+  22 instructions generated
+  8 registers used
+  22 instructions executed
+
+** Test2
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test2.ass ASSEMBLY BEGINS
+---test2.ass ASSEMBLY ENDS
+---test2.ass EXECUTION BEGINS
+7
+-5
+28
+-91
+70
+---test2.ass EXECUTION ENDS
+STATISTICS:
+  45 instructions generated
+  34 registers used
+  45 instructions executed
+
+** Test3
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test3.ass ASSEMBLY BEGINS
+---test3.ass ASSEMBLY ENDS
+---test3.ass EXECUTION BEGINS
+Enter a number: 123
+Enter a number: 456
+First is 123; second is 456
+---test3.ass EXECUTION ENDS
+STATISTICS:
+  15 instructions generated
+  5 registers used
+  15 instructions executed
+
+** Test4
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test4.ass ASSEMBLY BEGINS
+---test4.ass ASSEMBLY ENDS
+---test4.ass EXECUTION BEGINS
+13
+5
+
+78bce
+---test4.ass EXECUTION ENDS
+STATISTICS:
+  147 instructions generated
+  58 registers used
+  104 instructions executed
+
+** Test5
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test5.ass ASSEMBLY BEGINS
+---test5.ass ASSEMBLY ENDS
+---test5.ass EXECUTION BEGINS
+1
+WARNING: Disabled backward jump in   11: JMP 1  
+3
+WARNING: Disabled backward jump in   33: JMP 23  
+7
+WARNING: Disabled backward jump in   57: JMP 47  
+b
+WARNING: Disabled backward jump in   88: JMP 79  
+c
+WARNING: Disabled backward jump in  106: JMP 97  
+d
+WARNING: Disabled backward jump in  116: JMP 107  
+WARNING: Disabled backward jump in  117: JMP 89  
+---test5.ass EXECUTION ENDS
+STATISTICS:
+  119 instructions generated
+  51 registers used
+  88 instructions executed
+
+** Test6
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test6.ass ASSEMBLY BEGINS
+---test6.ass ASSEMBLY ENDS
+---test6.ass EXECUTION BEGINS
+truefalsefalsetruetruefalsefalsefalsetruefalsefalsefalsefalse
+---test6.ass EXECUTION ENDS
+STATISTICS:
+  161 instructions generated
+  51 registers used
+  115 instructions executed
+
+** Test7
+ASS/MULE - ASSembler/eMUlator for Language Engineering - v2.7 - Steve Gregory
+---test7.ass ASSEMBLY BEGINS
+---test7.ass ASSEMBLY ENDS
+---test7.ass EXECUTION BEGINS
+Factorial calculator
+Enter number: 10
+Factorial of 10 is 3628800
+
+Exponential calculator
+Enter base: 10  
+Enter exponent: 4
+10 raised to the power of 4 is 10000
+---test7.ass EXECUTION ENDS
+STATISTICS:
+  87 instructions generated
+  33 registers used
+  281 instructions executed
